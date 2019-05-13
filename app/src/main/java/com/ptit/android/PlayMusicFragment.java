@@ -110,11 +110,205 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
             textSearch = bundle.getString("txtSearch");
             currentSongIndex = bundle.getInt("songOnlineIndex");
             typeSearch = bundle.getLong("typeSearch");
+            if(typeSearch == 0) {
+                typeSearch = Constants.SEARCH_TYPE.TITLE;
+            }
             System.out.println("textSearch" + textSearch);
             System.out.println("typeSearch " + typeSearch);
             System.out.println("currentSongIndex " + currentSongIndex);
             playSongOnline(currentSongIndex);
         }
+
+
+        /**
+         * Play button click event
+         * plays a song and changes button to pause image
+         * pauses a song and changes button to play image
+         * */
+        btnPlay.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                // check for already playing
+                if (mp.isPlaying()) {
+                    if (mp != null) {
+                        mp.pause();
+                        // Changing button image to play button
+                        btnPlay.setImageResource(R.drawable.btn_play);
+                    }
+                } else {
+                    // Resume song
+                    if (mp != null) {
+                        mp.start();
+                        // Changing button image to pause button
+                        btnPlay.setImageResource(R.drawable.btn_pause);
+                    }
+                }
+
+            }
+        });
+
+        /**
+         * Forward button click event
+         * Forwards song specified seconds
+         * */
+        btnForward.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                // get current song position
+                int currentPosition = mp.getCurrentPosition();
+                // check if seekForward time is lesser than song duration
+                if (currentPosition + seekForwardTime <= mp.getDuration()) {
+                    // forward song
+                    mp.seekTo(currentPosition + seekForwardTime);
+                } else {
+                    // forward to end position
+                    mp.seekTo(mp.getDuration());
+                }
+            }
+        });
+
+        /**
+         * Backward button click event
+         * Backward song to specified seconds
+         * */
+        btnBackward.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                // get current song position
+                int currentPosition = mp.getCurrentPosition();
+                // check if seekBackward time is greater than 0 sec
+                if (currentPosition - seekBackwardTime >= 0) {
+                    // forward song
+                    mp.seekTo(currentPosition - seekBackwardTime);
+                } else {
+                    // backward to starting position
+                    mp.seekTo(0);
+                }
+
+            }
+        });
+
+        /**
+         * Next button click event
+         * Plays next song by taking currentSongIndex + 1
+         * */
+        btnNext.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                // check if next song is there or not
+                if(Constants.MODE.ONLINE.equals(mode)) {
+                    playSong(currentSongIndex);
+                } else {
+                    if (currentSongIndex < (songsList.size() - 1)) {
+                        playSong(currentSongIndex + 1);
+                        currentSongIndex = currentSongIndex + 1;
+                    } else {
+                        // play first song
+                        playSong(0);
+                        currentSongIndex = 0;
+                    }
+                }
+            }
+        });
+
+        /**
+         * Back button click event
+         * Plays previous song by currentSongIndex - 1
+         * */
+        btnPrevious.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                if(Constants.MODE.ONLINE.equals(mode)) {
+                    playSong(currentSongIndex);
+                } else {
+                    if (currentSongIndex > 0) {
+                        playSong(currentSongIndex - 1);
+                        currentSongIndex = currentSongIndex - 1;
+                    } else {
+                        // play last song
+                        playSong(songsList.size() - 1);
+                        currentSongIndex = songsList.size() - 1;
+                    }
+                }
+            }
+        });
+
+        /**
+         * Button Click event for Repeat button
+         * Enables repeat flag to true
+         * */
+        btnRepeat.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                if (isRepeat) {
+                    isRepeat = false;
+                    Toast.makeText(getActivity(), "Repeat is OFF", Toast.LENGTH_SHORT).show();
+                    btnRepeat.setImageResource(R.drawable.btn_repeat);
+                } else {
+                    // make repeat to true
+                    isRepeat = true;
+                    Toast.makeText(getActivity(), "Repeat is ON", Toast.LENGTH_SHORT).show();
+                    // make shuffle to false
+                    isShuffle = false;
+                    btnRepeat.setImageResource(R.drawable.btn_repeat_focused);
+                    btnShuffle.setImageResource(R.drawable.btn_shuffle);
+                }
+            }
+        });
+
+        /**
+         * Button Click event for Shuffle button
+         * Enables shuffle flag to true
+         * */
+        btnShuffle.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                if (isShuffle) {
+                    isShuffle = false;
+                    Toast.makeText(getActivity(), "Shuffle is OFF", Toast.LENGTH_SHORT).show();
+                    btnShuffle.setImageResource(R.drawable.btn_shuffle);
+                } else {
+                    // make repeat to true
+                    isShuffle = true;
+                    Toast.makeText(getActivity(), "Shuffle is ON", Toast.LENGTH_SHORT).show();
+                    // make shuffle to false
+                    isRepeat = false;
+                    btnShuffle.setImageResource(R.drawable.btn_shuffle_focused);
+                    btnRepeat.setImageResource(R.drawable.btn_repeat);
+                }
+            }
+        });
+
+        /**
+         * Button Click event for Play list click event
+         * Launches list activity which displays list of songs
+         * */
+//        btnPlaylist.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View arg0) {
+//                Intent in;
+//                if(Constants.MODE.OFFLINE.equals(mode)) {
+//                    songsList = songsListOffline;
+//                    in = new Intent(PlayMusicActivity.this, OfflineActivity.class);
+//                    startActivityForResult(in, Constants.MODE.OFFLINE.intValue());
+//                } else {
+//                    in = new Intent(PlayMusicActivity.this, OnlineFragment.class);
+//                    in.putExtra("txtSearch", textSearch);
+//                    in.putExtra("typeSearch", typeSearch);
+//                    startActivityForResult(in, Constants.MODE.ONLINE.intValue());
+//                }
+//
+////				startActivity(i);
+//            }
+//        });
     }
 
 //    @Override

@@ -90,6 +90,7 @@ public class OnlineFragment extends ListFragment {
                 bundle.putInt("songIndex", songIndex);
                 bundle.putString("txtSearch", txtSearch);
                 bundle.putLong("MODE", Constants.MODE.ONLINE);
+                bundle.putLong("typeSearch", Constants.SEARCH_TYPE.TITLE);
                 playMusicFragment = new PlayMusicFragment();
                 playMusicFragment.setArguments(bundle);
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
