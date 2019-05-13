@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -37,6 +39,7 @@ public class OnlineFragment extends ListFragment {
     private String txtSearch;
     private Long ONLINE_MODE = 2L;
     private Long typeSearch;
+    PlayMusicFragment playMusicFragment = new PlayMusicFragment();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -82,6 +85,18 @@ public class OnlineFragment extends ListFragment {
                 // getting listitem index
                 int songIndex = position;
                 // Starting new intent
+                txtSearch = edtSearch.getText().toString();
+                Bundle bundle = new Bundle();
+                bundle.putInt("songIndex", songIndex);
+                bundle.putString("txtSearch", txtSearch);
+                bundle.putLong("MODE", Constants.MODE.ONLINE);
+                playMusicFragment = new PlayMusicFragment();
+                playMusicFragment.setArguments(bundle);
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container, playMusicFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
 //                Intent in = new Intent(OnlineFragment.this, PlayMusicActivity.class);
 //                // Sending songIndex to PlayMusicActivity
 //                in.putExtra("songOnlineIndex", songIndex);
