@@ -93,10 +93,13 @@ public class OnlineFragment extends ListFragment {
                 bundle.putLong("typeSearch", Constants.SEARCH_TYPE.TITLE);
                 playMusicFragment = new PlayMusicFragment();
                 playMusicFragment.setArguments(bundle);
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentManager fragmentManager = MainActivity.fragmentManager;
+                System.out.println(fragmentManager.getFragments().toString());
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, playMusicFragment);
-                fragmentTransaction.addToBackStack(null);
+                MainActivity.playMusicFragment = playMusicFragment;
+                fragmentTransaction.replace(R.id.fragment_container, playMusicFragment, "playMusicFragment");
+//                MainActivity.navigationView.setSelectedItemId(R.id.actionPlaying);
+//                fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
 //                Intent in = new Intent(OnlineFragment.this, PlayMusicActivity.class);
 //                // Sending songIndex to PlayMusicActivity

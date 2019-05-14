@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.speech.RecognizerIntent;
 import android.util.Log;
@@ -82,7 +83,10 @@ public class MainActivity<recordingBufferLock> extends AppCompatActivity {
     private RecognizeCommands recognizeCommands = null;
     private Interpreter tfLite;
     private String txtSearch;
-
+    public static Fragment onlineFragment = new OnlineFragment();
+    public static Fragment offlineFragment = new OfflineFragment();
+    public static Fragment playMusicFragment = new PlayMusicFragment();
+    public static FragmentManager fragmentManager;
     // UI elements.
     private static final int REQUEST_RECORD_AUDIO = 13;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -106,8 +110,13 @@ public class MainActivity<recordingBufferLock> extends AppCompatActivity {
         setContentView(R.layout.main);
         BottomNavigationView navigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         navigationView.setOnNavigationItemSelectedListener(navListener);
-        loadFragment(new OfflineFragment());
         lblSeachResult = findViewById(R.id.lblSearchResult);
+        fragmentManager = getSupportFragmentManager();
+        loadFragment(offlineFragment, "offlineFragment");
+//        fragmentManager.beginTransaction().add(R.id.fragment_container, onlineFragment)
+//                .add(R.id.fragment_container, offlineFragment)
+//                .add(R.id.fragment_container, playMusicFragment)
+//                .commit();
         btnOnline = (ImageButton) findViewById(R.id.btnSearch);
 //        btnOffline = (Button) findViewById(R.id.btnOffline);
         edtSearch = (EditText) findViewById(R.id.txtSearch);
@@ -409,13 +418,14 @@ public class MainActivity<recordingBufferLock> extends AppCompatActivity {
         Log.v(LOG_TAG, "End recognition");
     }
 
-    private boolean loadFragment(Fragment fragment){
-        if (fragment != null){
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
+    private boolean loadFragment(Fragment fragment, String fragmentTag) {
+        if (fragment != null) {
+            fragmentManager.beginTransaction().add(R.id.fragment_container, fragment, fragmentTag).commit();
             return true;
         }
         return false;
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -432,29 +442,60 @@ public class MainActivity<recordingBufferLock> extends AppCompatActivity {
         }
     }
 
-     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                     Fragment fragment = null;
-                    switch (menuItem.getItemId()) {
-                        case R.id.actionOnline:
-                            fragment = new OnlineFragment();
-                            Toast.makeText(MainActivity.this, "Online", Toast.LENGTH_SHORT).show();
-                            break;
-                        case R.id.actionOffline:
-                            fragment = new OfflineFragment();
-                            Toast.makeText(MainActivity.this, "Offline", Toast.LENGTH_SHORT).show();
-                            break;
-                        case R.id.actionPlaying:
-                            fragment = new PlayMusicFragment();
-                            System.out.println("HTTT");
-                            break;
-                        case R.id.actionPersonal:
-                            Toast.makeText(MainActivity.this, "Personal", Toast.LENGTH_SHORT).show();
-                            break;
+                    if (offlineFragment != null && onlineFragment != null && playMusicFragment != null) {
+                        switch (menuItem.getItemId()) {
+                            case R.id.actionOnline:
+                                if (!checkIfFragmentExisted("onlineFragment")) {
+                                    loadFragment(onlineFragment, "onlineFragment");
+                                }
+                                showHideFragment(onlineFragment, offlineFragment, playMusicFragment);
+                                break;
+                            case R.id.actionOffline:
+                                if (!checkIfFragmentExisted("offlineFragment")) {
+                                    loadFragment(offlineFragment, "offlineFragment");
+                                }
+                                showHideFragment(offlineFragment, onlineFragment, playMusicFragment);
+                                break;
+                            case R.id.actionPlaying:
+                                if (!checkIfFragmentExisted("playMusicFragment")) {
+                                    System.out.println("NOT AĐDD");
+                                    loadFragment(playMusicFragment, "playMusicFragment");
+                                }
+                                showHideFragment(playMusicFragment, onlineFragment, offlineFragment);
+                                break;
+                            case R.id.actionPersonal:
+                                break;
+                        }
+                        return true;
                     }
-                    return loadFragment(fragment);
+                    return false;
                 }
             };
+
+    public void showHideFragment(Fragment fragment1, Fragment fragment2, Fragment fragment3) {
+        if (fragment1.isHidden()) {
+            fragmentManager.beginTransaction()
+                    .show(fragment1)
+                    .commit();
+        }
+        fragmentManager.beginTransaction()
+                .hide(fragment2)
+                .hide(fragment3)
+                .commit();
+    }
+
+    public boolean checkIfFragmentExisted(String fragmentTag){
+        Fragment fragment = fragmentManager.findFragmentByTag(fragmentTag);
+        if (fragment == null) {
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
 }
