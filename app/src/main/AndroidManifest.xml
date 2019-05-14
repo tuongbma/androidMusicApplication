@@ -28,7 +28,7 @@
         </activity>
         <activity android:name="com.ptit.android.OfflineActivity" />
         <activity android:name="com.ptit.android.PlayMusicActivity" />
-        <activity android:name="com.ptit.android.OnlineFragment" />
+        <activity android:name="com.ptit.android.Fragment.OnlineFragment" />
     </application>
 
 </manifest>

@@ -57,7 +57,7 @@
     <LinearLayout
         android:id="@+id/player_footer"
         android:layout_width="fill_parent"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
         android:layout_alignParentBottom="true"
         android:gravity="center"
         android:orientation="vertical">
@@ -127,7 +127,7 @@
     <!-- Timer Display -->
     <LinearLayout
         android:id="@+id/timerDisplay"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/songProgressBar"
         android:layout_marginLeft="20dp"
@@ -159,6 +159,16 @@
         android:layout_height="wrap_content"
         android:layout_above="@id/timerDisplay"
         android:gravity="center">
+        <!--Download Button-->
+
+        <ImageButton
+            android:id="@+id/btnDownload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="80dp"
+            android:background="@null"
+            android:src="@drawable/btn_download" />
+
         <!-- Repeat Button -->
         <ImageButton
             android:id="@+id/btnRepeat"
@@ -176,6 +186,14 @@
             android:layout_marginLeft="5dp"
             android:background="@null"
             android:src="@drawable/btn_shuffle" />
+
+        <ImageButton
+            android:id="@+id/btnLike"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="80dp"
+            android:background="@null"
+            android:src="@drawable/btn_like" />
 
     </LinearLayout>
 

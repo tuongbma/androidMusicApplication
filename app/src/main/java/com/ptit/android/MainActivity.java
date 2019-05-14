@@ -85,9 +85,9 @@ public class MainActivity<recordingBufferLock> extends AppCompatActivity {
     private RecognizeCommands recognizeCommands = null;
     private Interpreter tfLite;
     private String txtSearch;
-    public static Fragment onlineFragment = new OnlineFragment();
-    public static Fragment offlineFragment = new OfflineFragment();
-    public static Fragment playMusicFragment = new PlayMusicFragment();
+    public static Fragment onlineFragment = new com.ptit.android.OnlineFragment();
+    public static Fragment offlineFragment = new com.ptit.android.OfflineFragment();
+    public static Fragment playMusicFragment = new com.ptit.android.PlayMusicFragment();
     public static FragmentManager fragmentManager;
     // UI elements.
     private static final int REQUEST_RECORD_AUDIO = 13;

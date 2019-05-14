@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidhive.musicplayer.R;
+//import com.ptit.android.Fragment.OnlineFragment;
 import com.ptit.android.model.Song;
 
 public class PlayMusicActivity extends Activity implements OnCompletionListener, SeekBar.OnSeekBarChangeListener {
@@ -41,6 +42,8 @@ public class PlayMusicActivity extends Activity implements OnCompletionListener,
     private ImageButton btnPlaylist;
     private ImageButton btnRepeat;
     private ImageButton btnShuffle;
+    private ImageButton btnDownload;
+    private ImageButton btnLike;
     private SongsManager songManager;
     private SeekBar songProgressBar;
     private TextView songTitleLabel;
@@ -76,6 +79,8 @@ public class PlayMusicActivity extends Activity implements OnCompletionListener,
         btnForward = (ImageButton) findViewById(R.id.btnForward);
         btnBackward = (ImageButton) findViewById(R.id.btnBackward);
         btnNext = (ImageButton) findViewById(R.id.btnNext);
+        btnDownload = (ImageButton) findViewById(R.id.btnDownload);
+        btnLike = (ImageButton) findViewById(R.id.btnLike);
         btnPrevious = (ImageButton) findViewById(R.id.btnPrevious);
         btnPlaylist = (ImageButton) findViewById(R.id.btnPlaylist);
         btnRepeat = (ImageButton) findViewById(R.id.btnRepeat);
@@ -186,6 +191,21 @@ public class PlayMusicActivity extends Activity implements OnCompletionListener,
                         btnPlay.setImageResource(R.drawable.btn_pause);
                     }
                 }
+
+            }
+        });
+
+        btnDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+
+
+            }
+        });
+
+        btnLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
 
             }
         });
@@ -332,25 +352,25 @@ public class PlayMusicActivity extends Activity implements OnCompletionListener,
          * Button Click event for Play list click event
          * Launches list activity which displays list of songs
          * */
-        btnPlaylist.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                Intent in;
-                if(Constants.MODE.OFFLINE.equals(mode)) {
-                    songsList = songsListOffline;
-                    in = new Intent(PlayMusicActivity.this, OfflineActivity.class);
-                    startActivityForResult(in, Constants.MODE.OFFLINE.intValue());
-                } else {
-                    in = new Intent(PlayMusicActivity.this, OnlineFragment.class);
-                    in.putExtra("txtSearch", textSearch);
-                    in.putExtra("typeSearch", typeSearch);
-                    startActivityForResult(in, Constants.MODE.ONLINE.intValue());
-                }
-
-//				startActivity(i);
-            }
-        });
+//        btnPlaylist.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View arg0) {
+//                Intent in;
+//                if(Constants.MODE.OFFLINE.equals(mode)) {
+//                    songsList = songsListOffline;
+//                    in = new Intent(PlayMusicActivity.this, OfflineActivity.class);
+//                    startActivityForResult(in, Constants.MODE.OFFLINE.intValue());
+//                } else {
+//                    in = new Intent(PlayMusicActivity.this, OnlineFragment.class);
+//                    in.putExtra("txtSearch", textSearch);
+//                    in.putExtra("typeSearch", typeSearch);
+//                    startActivityForResult(in, Constants.MODE.ONLINE.intValue());
+//                }
+//
+////				startActivity(i);
+//            }
+//        });
 
         btnSearch = findViewById(R.id.btnSearch);
         searchText = (EditText) findViewById(R.id.txtSearch);
