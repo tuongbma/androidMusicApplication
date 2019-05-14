@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -106,8 +107,8 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
         mp.setOnCompletionListener(this); // Important
 
         Bundle bundle = getArguments();
-        mode = bundle.getLong("MODE");
-        if (mode != null && Constants.MODE.ONLINE.equals(mode)) {
+        try{
+            mode = bundle.getLong("MODE");
             textSearch = bundle.getString("txtSearch");
             currentSongIndex = bundle.getInt("songOnlineIndex");
             typeSearch = bundle.getLong("typeSearch");
@@ -118,8 +119,9 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
             System.out.println("typeSearch " + typeSearch);
             System.out.println("currentSongIndex " + currentSongIndex);
             playSongOnline(currentSongIndex);
+        } catch (NullPointerException e){
+            Toast.makeText(getActivity(), "Không có bài hát nào được phát", Toast.LENGTH_SHORT).show();
         }
-
 
         /**
          * Play button click event

@@ -47,7 +47,7 @@ public class SongsManager {
 	 * */
 	public ArrayList<Song> getOfflineList(){
 		// SDCard Path
-		String MEDIA_PATH = new String("/sdcard/Download/audio/");
+		String MEDIA_PATH = new String("/sdcard/Download/");
 		System.out.println(MEDIA_PATH);
 		songList = new ArrayList<>();
 		File home = new File(MEDIA_PATH);
