@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidhive.musicplayer.R;
+import com.ptit.android.model.Song;
 
 public class PlayMusicFragment extends Fragment implements OnCompletionListener, SeekBar.OnSeekBarChangeListener  {
     ImageButton btnSearch;
@@ -286,10 +287,10 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
             }
         });
 
-        /**
-         * Button Click event for Play list click event
-         * Launches list activity which displays list of songs
-         * */
+//        /**
+//         * Button Click event for Play list click event
+//         * Launches list activity which displays list of songs
+//         * */
 //        btnPlaylist.setOnClickListener(new View.OnClickListener() {
 //
 //            @Override
@@ -297,10 +298,10 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
 //                Intent in;
 //                if(Constants.MODE.OFFLINE.equals(mode)) {
 //                    songsList = songsListOffline;
-//                    in = new Intent(PlayMusicActivity.this, OfflineActivity.class);
+//                    in = new Intent(getActivity(), OnlineFragment.class);
 //                    startActivityForResult(in, Constants.MODE.OFFLINE.intValue());
 //                } else {
-//                    in = new Intent(PlayMusicActivity.this, OnlineFragment.class);
+//                    in = new Intent(getActivity(), OfflineFragment.class);
 //                    in.putExtra("txtSearch", textSearch);
 //                    in.putExtra("typeSearch", typeSearch);
 //                    startActivityForResult(in, Constants.MODE.ONLINE.intValue());
@@ -311,32 +312,31 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
 //        });
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == 100) { // play offline
-//            try{
-//                currentSongIndex = data.getExtras().getInt("songOfflineIndex");
-//                playSong(currentSongIndex);
-//            } catch (NullPointerException ex){
-//
-//            }
-//            // play selected song
-//
-//        }
-//        if (requestCode == Constants.MODE.ONLINE.intValue()) { // play online
-//            try{
-//                Intent intent = getIntent();
-//                textSearch = intent.getExtras().getString("txtSearch");
-//                currentSongIndex = data.getExtras().getInt("songOnlineIndex");
-//                playSongOnline(currentSongIndex);
-//            } catch (NullPointerException ex){
-//
-//            }
-//            // play selected song
-//
-//        }
-//    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100) { // play offline
+            try{
+                currentSongIndex = data.getExtras().getInt("songOfflineIndex");
+                playSong(currentSongIndex);
+            } catch (NullPointerException ex){
+
+            }
+            // play selected song
+
+        }
+        if (requestCode == Constants.MODE.ONLINE.intValue()) { // play online
+            try{
+                textSearch = data.getExtras().getString("txtSearch");
+                currentSongIndex = data.getExtras().getInt("songOnlineIndex");
+                playSongOnline(currentSongIndex);
+            } catch (NullPointerException ex){
+
+            }
+            // play selected song
+
+        }
+    }
 
     /**
      * Function to play a song
@@ -379,10 +379,9 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
             mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
             songManager.readData(textSearch, typeSearch, new SongsManager.MyCallback() {
                 @Override
-                public void onCallback(ArrayList<HashMap<String, String>> value) {
+                public void onCallback(ArrayList<Song> songList) {
                     try {
-                        songsList = value;
-                        String source = SERVER_STORAGE + value.get(songIndex).get("songPath");
+                        String source = SERVER_STORAGE + songList.get(songIndex).getSource();
                         setInfoPlayingSong(source);
                         mp.setDataSource(source);
                         mp.prepare();
@@ -416,7 +415,7 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
         MediaMetadataRetriever metaRetriver = new MediaMetadataRetriever();
         metaRetriver.setDataSource(source, new HashMap<String,String>());
 
-        byte[] art; art = metaRetriver.getEmbeddedPicture();
+        byte[] art = metaRetriver.getEmbeddedPicture();
         Bitmap songImage = BitmapFactory.decodeByteArray(art, 0, art.length);
         albumPic.setImageBitmap(songImage);
 

@@ -1,5 +1,11 @@
 package com.ptit.android;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.widget.EditText;
 import android.widget.ListAdapter;
@@ -20,13 +26,13 @@ import java.util.HashMap;
 
 public class SongsManager {
 
-	private ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
-    private ArrayList<HashMap<String, String>> songListOnline;
+    private ArrayList<Song> songList;
 	private String DB_NAME = "songs";
 	private FirebaseDatabase database;
 	private static Long TITLE_SEARCH_TYPE = 1L;
 	private static Long ARTST_SEARCH_TYPE = 2L;
-	// Constructor
+	private MediaMetadataRetriever metaRetriver;
+    // Constructor
 	public SongsManager(){
 	    database = FirebaseDatabase.getInstance();
 	}
@@ -39,30 +45,39 @@ public class SongsManager {
 	 * Function to read all mp3 files from sdcard
 	 * and store the details in ArrayList
 	 * */
-	public ArrayList<HashMap<String, String>> getOfflineList(){
+	public ArrayList<Song> getOfflineList(){
 		// SDCard Path
-		String MEDIA_PATH = new String("/sdcard/Download/");
+		String MEDIA_PATH = new String("/sdcard/Download/audio/");
+		System.out.println(MEDIA_PATH);
+		songList = new ArrayList<>();
 		File home = new File(MEDIA_PATH);
-
+		System.out.println("size: " + home.listFiles(new FileExtensionFilter()).length);
 		if (home.listFiles(new FileExtensionFilter()).length > 0) {
 			for (File file : home.listFiles(new FileExtensionFilter())) {
-				HashMap<String, String> song = new HashMap<String, String>();
-				song.put("songTitle", file.getName().substring(0, (file.getName().length() - 4)));
-				song.put("songPath", file.getPath());
+				Song bean = new Song();
+//				System.out.println(file.getName());
+//				HashMap<String, String> song = new HashMap<String, String>();
+//				song.put("songTitle", file.getName().substring(0, (file.getName().length() - 4)));
+//				song.put("songPath", file.getPath());
 				// Adding each song to SongList
-				songsList.add(song);
+				songList.add(bean);
 			}
 		}
 		// return songs list array
-		return songsList;
+		return songList;
 	}
 
+
+
+
+
+
 	public interface MyCallback {
-		void onCallback(ArrayList<HashMap<String, String>> value);
+		void onCallback(ArrayList<Song> value);
 	}
 
 	public void readData(final String text, final Long searchType, final MyCallback myCallback) {
-		songListOnline = new ArrayList<HashMap<String, String>>();
+        songList = new ArrayList<Song>();
 		DatabaseReference myRef = getFireBaseReference();
 		if (text != null && !text.isEmpty()) {
 			myRef.addValueEventListener(new ValueEventListener() {
@@ -75,11 +90,11 @@ public class SongsManager {
 						String songArtist = s.getArtist();
 						if (TITLE_SEARCH_TYPE.equals(searchType)) {
 							if (songTitle.toLowerCase().contains(searchTxt)) {
-								HashMap<String, String> song = new HashMap<String, String>();
-								song.put("songTitle", songTitle);
-								song.put("songPath", s.getSource());
+//								HashMap<String, String> song = new HashMap<String, String>();
+//								song.put("songTitle", songTitle);
+//								song.put("songPath", s.getSource());
 								// Adding each song to SongList
-								songListOnline.add(song);
+                                songList.add(s);
 							}
 						} else if (ARTST_SEARCH_TYPE.equals(searchType)) {
 							if (songArtist.contains(text.toUpperCase())) {
@@ -87,11 +102,11 @@ public class SongsManager {
 								song.put("songTitle", songTitle);
 								song.put("songPath", s.getSource());
 								// Adding each song to SongList
-								songListOnline.add(song);
+                                songList.add(s);
 							}
 						}
 					}
-					myCallback.onCallback(songListOnline);
+					myCallback.onCallback(songList);
 				}
 
 				@Override
@@ -110,4 +125,59 @@ public class SongsManager {
 		}
 	}
 
+	public Song getInfoSongFromSource(String source) {
+		System.out.println("source" + source);
+		source = Constants.STORE_FIREBASE_SERVER + source;
+		Song song = new Song();
+		metaRetriver = new MediaMetadataRetriever();
+		metaRetriver.setDataSource(source, new HashMap<String,String>());
+
+		byte[] art = metaRetriver.getEmbeddedPicture();
+		Bitmap songImage = BitmapFactory.decodeByteArray(art, 0, art.length);
+		song.setTitle(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
+		song.setArtist(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
+		String durationStr = formateMilliSeccond(Long.parseLong(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)));
+		song.setDuration(durationStr);
+		song.setSongImage(songImage);
+//		song.setSongId(id);
+		return song;
+//		songTitleLabel.setText(songTitle);
+	}
+
+	/**
+	 * Function to convert milliseconds time to
+	 * Timer Format
+	 * Hours:Minutes:Seconds
+	 */
+	public static String formateMilliSeccond(long milliseconds) {
+		String finalTimerString = "";
+		String secondsString = "";
+
+		// Convert total duration into time
+		int hours = (int) (milliseconds / (1000 * 60 * 60));
+		int minutes = (int) (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
+		int seconds = (int) ((milliseconds % (1000 * 60 * 60)) % (1000 * 60) / 1000);
+
+		// Add hours if there
+		if (hours > 0) {
+			finalTimerString = hours + ":";
+		}
+
+		// Prepending 0 to seconds if it is one digit
+		if (seconds < 10) {
+			secondsString = "0" + seconds;
+		} else {
+			secondsString = "" + seconds;
+		}
+
+		finalTimerString = finalTimerString + minutes + ":" + secondsString;
+
+		//      return  String.format("%02d Min, %02d Sec",
+		//                TimeUnit.MILLISECONDS.toMinutes(milliseconds),
+		//                TimeUnit.MILLISECONDS.toSeconds(milliseconds) -
+		//                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliseconds)));
+
+		// return timer string
+		return finalTimerString;
+	}
 }

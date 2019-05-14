@@ -35,9 +35,9 @@
     <ListView
         android:id="@android:id/list"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:divider="#242424"
+        android:layout_height="wrap_content"
+        android:divider="#b5b5b5"
         android:dividerHeight="1dp"
-        android:listSelector="@drawable/list_selector" />
+        android:listSelector="@drawable/gradient_bg_hover" />
 
 </LinearLayout>

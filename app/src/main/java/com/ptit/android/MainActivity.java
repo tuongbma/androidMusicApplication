@@ -44,6 +44,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidhive.musicplayer.R;
+import com.ptit.android.MyAdapter.MyArrayAdapter;
+import com.ptit.android.model.Song;
 import com.ptit.android.speechrecognize.RecognizeCommands;
 
 
@@ -51,7 +53,7 @@ public class MainActivity<recordingBufferLock> extends AppCompatActivity {
 
     private Button btnOffline;
     private ImageButton btnOnline;
-    private ListView lvSearch;
+    private ListView lvSong;
     private SongsManager songsManager = new SongsManager();
     private TextView lblSeachResult;
     private ArrayAdapter<String> adapter;
@@ -199,15 +201,22 @@ public class MainActivity<recordingBufferLock> extends AppCompatActivity {
 
 
     public void performSearch(String txtSearch) {
-        SongsManager songsManager = new SongsManager();
+        final SongsManager songsManager = new SongsManager();
         songsManager.readData(txtSearch, Constants.SEARCH_TYPE.TITLE, new SongsManager.MyCallback() {
             @Override
-            public void onCallback(ArrayList<HashMap<String, String>> songList) {
+            public void onCallback(ArrayList<Song> songList) {
                 System.out.println("size songlist:" + songList.size());
-                ListAdapter adapter = new SimpleAdapter(MainActivity.this, songList,
-                        R.layout.playlist_item, new String[]{"songTitle"}, new int[]{
-                        R.id.songTitle});
+//                ListAdapter adapter = new SimpleAdapter(MainActivity.this, songList,
+//                        R.layout.playlist_item, new String[]{"songTitle"}, new int[]{
+//                        R.id.songTitle});
 //                setListAdapter(adapter);
+                ArrayList<Song> songLst = new ArrayList<>();
+                for (Song song : songList) {
+                    Song songBean = songsManager.getInfoSongFromSource(song.getSource());
+                    songLst.add(songBean);
+                }
+                MyArrayAdapter mayArr = new MyArrayAdapter(MainActivity.this, R.layout.list_row, songLst);
+                lvSong.setAdapter(mayArr);
             }
 
         });
@@ -448,7 +457,6 @@ public class MainActivity<recordingBufferLock> extends AppCompatActivity {
                             break;
                         case R.id.actionPlaying:
                             fragment = new PlayMusicFragment();
-                            System.out.println("HTTT");
                             break;
                         case R.id.actionPersonal:
                             Toast.makeText(MainActivity.this, "Personal", Toast.LENGTH_SHORT).show();

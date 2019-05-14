@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidhive.musicplayer.R;
+import com.ptit.android.model.Song;
 
 public class PlayMusicActivity extends Activity implements OnCompletionListener, SeekBar.OnSeekBarChangeListener {
     ImageButton btnSearch;
@@ -60,9 +61,9 @@ public class PlayMusicActivity extends Activity implements OnCompletionListener,
     private boolean isShuffle = false;
     private boolean isRepeat = false;
     private static final String SERVER_STORAGE = "https://firebasestorage.googleapis.com/v0/b/musicapplication-f21a5.appspot.com/o/";
-    private ArrayList<HashMap<String, String>> songsListOffline = new ArrayList<HashMap<String, String>>();
-    private ArrayList<HashMap<String, String>> songsListOnline = new ArrayList<HashMap<String, String>>();
-    private ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
+    private ArrayList<Song> songsListOffline = new ArrayList<>();
+    private ArrayList<Song> songsListOnline = new ArrayList<>();
+    private ArrayList<Song> songsList = new ArrayList<>();
 
     @SuppressLint("WrongViewCast")
     @Override
@@ -408,11 +409,11 @@ public class PlayMusicActivity extends Activity implements OnCompletionListener,
         // Play song
         try {
             mp.reset();
-            mp.setDataSource(songsList.get(songIndex).get("songPath"));
+            mp.setDataSource(songsList.get(songIndex).getSource());
             mp.prepare();
             mp.start();
             // Displaying Song title
-            String songTitle = songsList.get(songIndex).get("songTitle");
+            String songTitle = songsList.get(songIndex).getTitle();
             songTitleLabel.setText(songTitle);
 
             // Changing Button Image to pause image
@@ -440,10 +441,9 @@ public class PlayMusicActivity extends Activity implements OnCompletionListener,
             mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
             songManager.readData(textSearch, typeSearch, new SongsManager.MyCallback() {
                 @Override
-                public void onCallback(ArrayList<HashMap<String, String>> value) {
+                public void onCallback(ArrayList<Song> songList) {
                     try {
-                        songsList = value;
-                        String source = SERVER_STORAGE + value.get(songIndex).get("songPath");
+                        String source = SERVER_STORAGE + songList.get(songIndex).getSource();
                         setInfoPlayingSong(source);
                         mp.setDataSource(source);
                         mp.prepare();

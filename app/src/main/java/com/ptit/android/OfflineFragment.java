@@ -21,10 +21,14 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.androidhive.musicplayer.R;
+import com.ptit.android.MyAdapter.MyArrayAdapter;
+import com.ptit.android.model.Song;
 
 public class OfflineFragment extends ListFragment {
     // Songs list
-    public ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
+    public ArrayList<Song> songsList = new ArrayList<>();
+    private PlayMusicFragment playMusicFragment = new PlayMusicFragment();
+    private Bundle bundle = new Bundle();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -47,16 +51,17 @@ public class OfflineFragment extends ListFragment {
 //			// adding HashList to ArrayList
 //			listOffline.add(song);
 //		}
-
-            // Adding menuItems to ListView
-            ListAdapter adapter = new SimpleAdapter(getActivity(), songsList,
-                    R.layout.playlist_item, new String[]{"songTitle"}, new int[]{
-                    R.id.songTitle});
-
-            setListAdapter(adapter);
-
             // selecting single ListView item
             ListView lv = getListView();
+
+            // Adding menuItems to ListView
+//            ListAdapter adapter = new SimpleAdapter(getActivity(), songsList,
+//                    R.layout.playlist_item, new String[]{"songTitle"}, new int[]{
+//                    R.id.songTitle});
+//
+//            setListAdapter(adapter);
+            MyArrayAdapter mayArr = new MyArrayAdapter(getActivity(), R.layout.list_row, songsList);
+            lv.setAdapter(mayArr);
             // listening to single listitem click
             lv.setOnItemClickListener(new OnItemClickListener() {
 
@@ -71,6 +76,12 @@ public class OfflineFragment extends ListFragment {
                     in.putExtra("songOfflineIndex", songIndex);
 //                    setResult(100, in);
 //                    finish();
+
+                    bundle.putInt("songIndex", songIndex);
+                    bundle.putLong("MODE", Constants.MODE.OFFLINE);
+                    bundle.putLong("typeSearch", Constants.SEARCH_TYPE.TITLE);
+                    playMusicFragment = new PlayMusicFragment();
+                    playMusicFragment.setArguments(bundle);
                 }
             });
         }

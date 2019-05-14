@@ -26,6 +26,8 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import com.androidhive.musicplayer.R;
+import com.ptit.android.MyAdapter.MyArrayAdapter;
+import com.ptit.android.model.Song;
 
 public class OnlineFragment extends ListFragment {
     private String TAG = "FIREBASE";
@@ -37,9 +39,9 @@ public class OnlineFragment extends ListFragment {
     private ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
     private int currentSongIndex = 0;
     private String txtSearch;
-    private Long ONLINE_MODE = 2L;
     private Long typeSearch;
-    PlayMusicFragment playMusicFragment = new PlayMusicFragment();
+    private PlayMusicFragment playMusicFragment = new PlayMusicFragment();
+    private Bundle bundle = new Bundle();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -86,13 +88,14 @@ public class OnlineFragment extends ListFragment {
                 int songIndex = position;
                 // Starting new intent
                 txtSearch = edtSearch.getText().toString();
-                Bundle bundle = new Bundle();
                 bundle.putInt("songIndex", songIndex);
                 bundle.putString("txtSearch", txtSearch);
                 bundle.putLong("MODE", Constants.MODE.ONLINE);
                 bundle.putLong("typeSearch", Constants.SEARCH_TYPE.TITLE);
+
                 playMusicFragment = new PlayMusicFragment();
                 playMusicFragment.setArguments(bundle);
+
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.fragment_container, playMusicFragment);
@@ -154,15 +157,23 @@ public class OnlineFragment extends ListFragment {
 //    }
 
     public void performSearch(String txtSearch) {
-        SongsManager songsManager = new SongsManager();
+        final SongsManager songsManager = new SongsManager();
             songsManager.readData(txtSearch, typeSearch, new SongsManager.MyCallback() {
                 @Override
-                public void onCallback(ArrayList<HashMap<String, String>> songList) {
+                public void onCallback(ArrayList<Song> songList) {
                     System.out.println("size songlist:" + songList.size());
-                    ListAdapter adapter = new SimpleAdapter(getActivity(), songList,
-                            R.layout.playlist_item, new String[]{"songTitle"}, new int[]{
-                            R.id.songTitle});
-                    setListAdapter(adapter);
+                    ArrayList<Song> songLst = new ArrayList<>();
+                    for (Song song : songList) {
+                        Song songBean = songsManager.getInfoSongFromSource(song.getSource());
+                        songLst.add(songBean);
+                    }
+                    MyArrayAdapter mayArr = new MyArrayAdapter(getActivity(), R.layout.list_row, songLst);
+                    lvSong.setAdapter(mayArr);
+
+//                    ListAdapter adapter = new SimpleAdapter(getActivity(), songList,
+//                            R.layout.playlist_item, new String[]{"songTitle"}, new int[]{
+//                            R.id.songTitle});
+//                    setListAdapter(adapter);
                 }
             });
         }

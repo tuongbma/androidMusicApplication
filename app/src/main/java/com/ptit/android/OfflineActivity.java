@@ -30,7 +30,7 @@ public class OfflineActivity extends ListActivity {
 
         SongsManager songsManager = new SongsManager();
         // get all songs from sdcard
-        this.songsList = songsManager.getOfflineList();
+//        this.songsList = songsManager.getOfflineList();
         if (songsList.size() == 0) {
             toastMessage("Khong co bai hat nao");
         } else {

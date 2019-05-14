@@ -1,11 +1,14 @@
 package com.ptit.android.model;
 
+import android.graphics.Bitmap;
+
 public class Song {
     private String songId;
     private String title;
     private String artist;
     private String source;
     private String duration;
+    private Bitmap songImage;
     private String genre;
 
     public Song() {
@@ -57,5 +60,13 @@ public class Song {
 
     public void setGenre(String genre) {
         this.genre = genre;
+    }
+
+    public Bitmap getSongImage() {
+        return songImage;
+    }
+
+    public void setSongImage(Bitmap songImage) {
+        this.songImage = songImage;
     }
 }
