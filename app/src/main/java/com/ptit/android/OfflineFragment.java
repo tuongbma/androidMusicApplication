@@ -2,6 +2,7 @@ package com.ptit.android;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -9,12 +10,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -29,6 +35,10 @@ public class OfflineFragment extends ListFragment {
     public ArrayList<Song> songsList = new ArrayList<>();
     private PlayMusicFragment playMusicFragment = new PlayMusicFragment();
     private Bundle bundle = new Bundle();
+    private EditText edtSearch;
+    private SongsManager songsManager;
+    private String txtSearch;
+    private ListView lv;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -38,28 +48,15 @@ public class OfflineFragment extends ListFragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        SongsManager songsManager = new SongsManager();
+        edtSearch = view.findViewById(R.id.txtSearch);
+        songsManager = new SongsManager();
         // get all songs from sdcard
         this.songsList = songsManager.getOfflineList();
         if (songsList.size() == 0) {
             toastMessage("Khong co bai hat nao");
         } else {
-            // looping through show_list_songs
-//		for (int i = 0; i < songsList.size(); i++) {
-//			// creating new HashMap
-//			HashMap<String, String> song = songsList.get(i);
-//			// adding HashList to ArrayList
-//			listOffline.add(song);
-//		}
             // selecting single ListView item
-            ListView lv = getListView();
-
-            // Adding menuItems to ListView
-//            ListAdapter adapter = new SimpleAdapter(getActivity(), songsList,
-//                    R.layout.playlist_item, new String[]{"songTitle"}, new int[]{
-//                    R.id.songTitle});
-//
-//            setListAdapter(adapter);
+            lv = getListView();
             MyArrayAdapter mayArr = new MyArrayAdapter(getActivity(), R.layout.list_row, songsList);
             lv.setAdapter(mayArr);
             // listening to single listitem click
@@ -70,112 +67,49 @@ public class OfflineFragment extends ListFragment {
                                         int position, long id) {
                     // getting listitem index
                     int songIndex = position;
-                    // Starting new intent
-                    Intent in = new Intent();
-                    // Sending songIndex to PlayMusicActivity
-                    in.putExtra("songOfflineIndex", songIndex);
-//                    setResult(100, in);
-//                    finish();
+                    txtSearch = edtSearch.getText().toString();
 
                     bundle.putInt("songIndex", songIndex);
                     bundle.putLong("MODE", Constants.MODE.OFFLINE);
+                    bundle.putString("txtSearch", txtSearch);
                     bundle.putLong("typeSearch", Constants.SEARCH_TYPE.TITLE);
+
                     playMusicFragment = new PlayMusicFragment();
                     playMusicFragment.setArguments(bundle);
+
+                    FragmentManager fragmentManager = MainActivity.fragmentManager;
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    MainActivity.playMusicFragment = playMusicFragment;
+                    fragmentTransaction.replace(R.id.fragment_container, playMusicFragment, "playMusicFragment");
+                    fragmentTransaction.commit();
+                }
+            });
+
+            edtSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    performSearch(edtSearch.getText().toString());
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
                 }
             });
         }
     }
-
-    //    @Override
-//    public void onCreate(final Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.show_list_songs);
-//            SongsManager songsManager = new SongsManager();
-//            // get all songs from sdcard
-//            this.songsList = songsManager.getOfflineList();
-//            if (songsList.size() == 0) {
-//                toastMessage("Khong co bai hat nao");
-//            } else {
-//                // looping through show_list_songs
-////		for (int i = 0; i < songsList.size(); i++) {
-////			// creating new HashMap
-////			HashMap<String, String> song = songsList.get(i);
-////			// adding HashList to ArrayList
-////			listOffline.add(song);
-////		}
-//
-//                // Adding menuItems to ListView
-//                ListAdapter adapter = new SimpleAdapter(this, songsList,
-//                        R.layout.playlist_item, new String[]{"songTitle"}, new int[]{
-//                        R.id.songTitle});
-//
-//                setListAdapter(adapter);
-//
-//                // selecting single ListView item
-//                ListView lv = getListView();
-//                // listening to single listitem click
-//                lv.setOnItemClickListener(new OnItemClickListener() {
-//
-//                    @Override
-//                    public void onItemClick(AdapterView<?> parent, View view,
-//                                            int position, long id) {
-//                        // getting listitem index
-//                        int songIndex = position;
-//                        // Starting new intent
-//                        Intent in = new Intent();
-//                        // Sending songIndex to PlayMusicActivity
-//                        in.putExtra("songOfflineIndex", songIndex);
-//                        setResult(100, in);
-//                        finish();
-//                    }
-//                });
-//            }
-//
-////		final ArrayList<HashMap<String, String>> listOffline = new ArrayList<HashMap<String, String>>();
-//
-//        SongsManager songsManager = new SongsManager();
-//        // get all songs from sdcard
-//        this.songsList = songsManager.getOfflineList();
-//        if (songsList.size() == 0) {
-//            toastMessage("Khong co bai hat nao");
-//        } else {
-//            // looping through show_list_songs
-////		for (int i = 0; i < songsList.size(); i++) {
-////			// creating new HashMap
-////			HashMap<String, String> song = songsList.get(i);
-////			// adding HashList to ArrayList
-////			listOffline.add(song);
-////		}
-//
-//            // Adding menuItems to ListView
-//            ListAdapter adapter = new SimpleAdapter(this, songsList,
-//                    R.layout.playlist_item, new String[]{"songTitle"}, new int[]{
-//                    R.id.songTitle});
-//
-//            setListAdapter(adapter);
-//
-//            // selecting single ListView item
-//            ListView lv = getListView();
-//            // listening to single listitem click
-//            lv.setOnItemClickListener(new OnItemClickListener() {
-//
-//                @Override
-//                public void onItemClick(AdapterView<?> parent, View view,
-//                                        int position, long id) {
-//                    // getting listitem index
-//                    int songIndex = position;
-//                    // Starting new intent
-//                    Intent in = new Intent();
-//                    // Sending songIndex to PlayMusicActivity
-//                    in.putExtra("songOfflineIndex", songIndex);
-//                    setResult(100, in);
-//                    finish();
-//                }
-//            });
-//        }
-////
-//    }
+    public void performSearch(String txtSearch) {
+        ArrayList<Song> songSearch = new ArrayList<>();
+        songsManager = new SongsManager();
+        songSearch = songsManager.getSearchSongOffline(songsList, Constants.SEARCH_TYPE.TITLE, txtSearch);
+        MyArrayAdapter mayArr = new MyArrayAdapter(getActivity(), R.layout.list_row, songSearch);
+        lv.setAdapter(mayArr);
+    }
 
     private void toastMessage(String message) {
         Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();

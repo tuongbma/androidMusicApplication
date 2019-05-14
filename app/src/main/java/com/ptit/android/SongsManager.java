@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class SongsManager {
 
@@ -54,12 +55,8 @@ public class SongsManager {
 		System.out.println("size: " + home.listFiles(new FileExtensionFilter()).length);
 		if (home.listFiles(new FileExtensionFilter()).length > 0) {
 			for (File file : home.listFiles(new FileExtensionFilter())) {
-				Song bean = new Song();
-//				System.out.println(file.getName());
-//				HashMap<String, String> song = new HashMap<String, String>();
-//				song.put("songTitle", file.getName().substring(0, (file.getName().length() - 4)));
-//				song.put("songPath", file.getPath());
-				// Adding each song to SongList
+				String filePath = file.getAbsolutePath().replaceAll("\\s+","");
+				Song bean = getInfoSongFromSource(Constants.MODE.OFFLINE, filePath);
 				songList.add(bean);
 			}
 		}
@@ -67,15 +64,16 @@ public class SongsManager {
 		return songList;
 	}
 
-
-
-
-
-
 	public interface MyCallback {
 		void onCallback(ArrayList<Song> value);
 	}
 
+	/**
+	 * ham search online
+	 * @param text
+	 * @param searchType
+	 * @param myCallback
+	 */
 	public void readData(final String text, final Long searchType, final MyCallback myCallback) {
         songList = new ArrayList<Song>();
 		DatabaseReference myRef = getFireBaseReference();
@@ -90,17 +88,10 @@ public class SongsManager {
 						String songArtist = s.getArtist();
 						if (TITLE_SEARCH_TYPE.equals(searchType)) {
 							if (songTitle.toLowerCase().contains(searchTxt)) {
-//								HashMap<String, String> song = new HashMap<String, String>();
-//								song.put("songTitle", songTitle);
-//								song.put("songPath", s.getSource());
-								// Adding each song to SongList
                                 songList.add(s);
 							}
 						} else if (ARTST_SEARCH_TYPE.equals(searchType)) {
 							if (songArtist.contains(text.toUpperCase())) {
-								HashMap<String, String> song = new HashMap<String, String>();
-								song.put("songTitle", songTitle);
-								song.put("songPath", s.getSource());
 								// Adding each song to SongList
                                 songList.add(s);
 							}
@@ -125,12 +116,22 @@ public class SongsManager {
 		}
 	}
 
-	public Song getInfoSongFromSource(String source) {
-		System.out.println("source" + source);
-		source = Constants.STORE_FIREBASE_SERVER + source;
+	/**
+	 * lay thong tin bai hat
+	 * @param mode
+	 * @param source
+	 * @return
+	 */
+	public Song getInfoSongFromSource(Long mode, String source) {
 		Song song = new Song();
 		metaRetriver = new MediaMetadataRetriever();
-		metaRetriver.setDataSource(source, new HashMap<String,String>());
+		if(Constants.MODE.ONLINE.equals(mode)) {
+			source = Constants.STORE_FIREBASE_SERVER + source;
+			metaRetriver.setDataSource(source, new HashMap<String,String>());
+			System.out.println("source" + source);
+		} else {
+			metaRetriver.setDataSource(source);
+		}
 
 		byte[] art = metaRetriver.getEmbeddedPicture();
 		Bitmap songImage = BitmapFactory.decodeByteArray(art, 0, art.length);
@@ -139,6 +140,7 @@ public class SongsManager {
 		String durationStr = formateMilliSeccond(Long.parseLong(metaRetriver.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)));
 		song.setDuration(durationStr);
 		song.setSongImage(songImage);
+		song.setSource(source);
 //		song.setSongId(id);
 		return song;
 //		songTitleLabel.setText(songTitle);
@@ -171,13 +173,34 @@ public class SongsManager {
 		}
 
 		finalTimerString = finalTimerString + minutes + ":" + secondsString;
-
-		//      return  String.format("%02d Min, %02d Sec",
-		//                TimeUnit.MILLISECONDS.toMinutes(milliseconds),
-		//                TimeUnit.MILLISECONDS.toSeconds(milliseconds) -
-		//                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliseconds)));
-
 		// return timer string
 		return finalTimerString;
+	}
+
+	/**
+	 * lay list search offline
+	 * @param songList
+	 * @param searchType
+	 * @param txtSearch
+	 * @return
+	 */
+	public ArrayList<Song> getSearchSongOffline(List<Song> songList, Long searchType, String txtSearch) {
+		ArrayList<Song> lstResult = new ArrayList<>();
+		for (Song s : songList) {
+			String songTitle = s.getTitle();
+			String songArtist = s.getArtist();
+			if (TITLE_SEARCH_TYPE.equals(searchType)) {
+				if (songTitle.toLowerCase().contains(txtSearch)) {
+					lstResult.add(s);
+				}
+			} else if (ARTST_SEARCH_TYPE.equals(searchType)) {
+				if (songArtist.contains(txtSearch.toUpperCase())) {
+					lstResult.add(s);
+				}
+			} else {
+				lstResult.add(s);
+			}
+		}
+		return lstResult;
 	}
 }

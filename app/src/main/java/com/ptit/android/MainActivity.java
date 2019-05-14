@@ -209,27 +209,27 @@ public class MainActivity<recordingBufferLock> extends AppCompatActivity {
     }
 
 
-    public void performSearch(String txtSearch) {
-        final SongsManager songsManager = new SongsManager();
-        songsManager.readData(txtSearch, Constants.SEARCH_TYPE.TITLE, new SongsManager.MyCallback() {
-            @Override
-            public void onCallback(ArrayList<Song> songList) {
-                System.out.println("size songlist:" + songList.size());
-//                ListAdapter adapter = new SimpleAdapter(MainActivity.this, songList,
-//                        R.layout.playlist_item, new String[]{"songTitle"}, new int[]{
-//                        R.id.songTitle});
-//                setListAdapter(adapter);
-                ArrayList<Song> songLst = new ArrayList<>();
-                for (Song song : songList) {
-                    Song songBean = songsManager.getInfoSongFromSource(song.getSource());
-                    songLst.add(songBean);
-                }
-                MyArrayAdapter mayArr = new MyArrayAdapter(MainActivity.this, R.layout.list_row, songLst);
-                lvSong.setAdapter(mayArr);
-            }
-
-        });
-    }
+//    public void performSearch(String txtSearch) {
+//        final SongsManager songsManager = new SongsManager();
+//        songsManager.readData(txtSearch, Constants.SEARCH_TYPE.TITLE, new SongsManager.MyCallback() {
+//            @Override
+//            public void onCallback(ArrayList<Song> songList) {
+//                System.out.println("size songlist:" + songList.size());
+////                ListAdapter adapter = new SimpleAdapter(MainActivity.this, songList,
+////                        R.layout.playlist_item, new String[]{"songTitle"}, new int[]{
+////                        R.id.songTitle});
+////                setListAdapter(adapter);
+//                ArrayList<Song> songLst = new ArrayList<>();
+//                for (Song song : songList) {
+//                    Song songBean = songsManager.getInfoSongFromSource(song.getSource());
+//                    songLst.add(songBean);
+//                }
+//                MyArrayAdapter mayArr = new MyArrayAdapter(MainActivity.this, R.layout.list_row, songLst);
+//                lvSong.setAdapter(mayArr);
+//            }
+//
+//        });
+//    }
 
 
     private void requestMicrophonePermission() {

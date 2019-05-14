@@ -71,7 +71,7 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
     private static final String SERVER_STORAGE = "https://firebasestorage.googleapis.com/v0/b/musicapplication-f21a5.appspot.com/o/";
     private ArrayList<HashMap<String, String>> songsListOffline = new ArrayList<HashMap<String, String>>();
     private ArrayList<HashMap<String, String>> songsListOnline = new ArrayList<HashMap<String, String>>();
-    private ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
+    private ArrayList<Song> songsList = new ArrayList<Song>();
 
     @Nullable
     @Override
@@ -109,16 +109,23 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
         Bundle bundle = getArguments();
         try{
             mode = bundle.getLong("MODE");
-            textSearch = bundle.getString("txtSearch");
-            currentSongIndex = bundle.getInt("songOnlineIndex");
             typeSearch = bundle.getLong("typeSearch");
+            currentSongIndex = bundle.getInt("songIndex");
+            textSearch = bundle.getString("txtSearch");
             if(typeSearch == 0) {
                 typeSearch = Constants.SEARCH_TYPE.TITLE;
             }
-            System.out.println("textSearch" + textSearch);
-            System.out.println("typeSearch " + typeSearch);
-            System.out.println("currentSongIndex " + currentSongIndex);
-            playSongOnline(currentSongIndex);
+            //kiem tra xem online hay offline
+            if(Constants.MODE.ONLINE.equals(mode)) {
+                playSongOnline(currentSongIndex);
+            } else {
+                SongsManager songMng = new SongsManager();
+                ArrayList<Song> totalSongOffline = songManager.getOfflineList();
+                songsList = songMng.getSearchSongOffline(totalSongOffline, Constants.SEARCH_TYPE.TITLE, textSearch);
+                System.out.println("current song " + currentSongIndex);
+                playSongOffline(currentSongIndex);
+            }
+
         } catch (NullPointerException e){
             Toast.makeText(getActivity(), "Không có bài hát nào được phát", Toast.LENGTH_SHORT).show();
         }
@@ -204,14 +211,14 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
             public void onClick(View arg0) {
                 // check if next song is there or not
                 if(Constants.MODE.ONLINE.equals(mode)) {
-                    playSong(currentSongIndex);
+                    playSongOffline(currentSongIndex);
                 } else {
                     if (currentSongIndex < (songsList.size() - 1)) {
-                        playSong(currentSongIndex + 1);
+                        playSongOffline(currentSongIndex + 1);
                         currentSongIndex = currentSongIndex + 1;
                     } else {
                         // play first song
-                        playSong(0);
+                        playSongOffline(0);
                         currentSongIndex = 0;
                     }
                 }
@@ -227,14 +234,14 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
             @Override
             public void onClick(View arg0) {
                 if(Constants.MODE.ONLINE.equals(mode)) {
-                    playSong(currentSongIndex);
+                    playSongOffline(currentSongIndex);
                 } else {
                     if (currentSongIndex > 0) {
-                        playSong(currentSongIndex - 1);
+                        playSongOffline(currentSongIndex - 1);
                         currentSongIndex = currentSongIndex - 1;
                     } else {
                         // play last song
-                        playSong(songsList.size() - 1);
+                        playSongOffline(songsList.size() - 1);
                         currentSongIndex = songsList.size() - 1;
                     }
                 }
@@ -320,7 +327,7 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
         if (requestCode == 100) { // play offline
             try{
                 currentSongIndex = data.getExtras().getInt("songOfflineIndex");
-                playSong(currentSongIndex);
+                playSongOffline(currentSongIndex);
             } catch (NullPointerException ex){
 
             }
@@ -343,18 +350,19 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
     /**
      * Function to play a song
      *
+     *
      * @param songIndex - index of song
      */
-    public void playSong(int songIndex) {
+    public void playSongOffline(int songIndex) {
         // Play song
         try {
             mp.reset();
-            mp.setDataSource(songsList.get(songIndex).get("songPath"));
+            String source = songsList.get(songIndex).getSource();
+            System.out.println("soure song: " + source);
+            mp.setDataSource(source);
+            setInfoPlayingSong(source);
             mp.prepare();
             mp.start();
-            // Displaying Song title
-            String songTitle = songsList.get(songIndex).get("songTitle");
-            songTitleLabel.setText(songTitle);
 
             // Changing Button Image to pause image
             btnPlay.setImageResource(R.drawable.btn_pause);
@@ -415,7 +423,11 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
 
     public void setInfoPlayingSong(String source) {
         MediaMetadataRetriever metaRetriver = new MediaMetadataRetriever();
-        metaRetriver.setDataSource(source, new HashMap<String,String>());
+        if(Constants.MODE.ONLINE.equals(mode)) {
+            metaRetriver.setDataSource(source, new HashMap<String,String>());
+        } else {
+            metaRetriver.setDataSource(source);
+        }
 
         byte[] art = metaRetriver.getEmbeddedPicture();
         Bitmap songImage = BitmapFactory.decodeByteArray(art, 0, art.length);
@@ -492,20 +504,20 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
         // check for repeat is ON or OFF
         if (isRepeat) {
             // repeat is on play same song again
-            playSong(currentSongIndex);
+            playSongOffline(currentSongIndex);
         } else if (isShuffle) {
             // shuffle is on - play a random song
             Random rand = new Random();
             currentSongIndex = rand.nextInt((songsList.size() - 1) - 0 + 1) + 0;
-            playSong(currentSongIndex);
+            playSongOffline(currentSongIndex);
         } else {
             // no repeat or shuffle ON - play next song
             if (currentSongIndex < (songsList.size() - 1)) {
-                playSong(currentSongIndex + 1);
+                playSongOffline(currentSongIndex + 1);
                 currentSongIndex = currentSongIndex + 1;
             } else {
                 // play first song
-                playSong(0);
+                playSongOffline(0);
                 currentSongIndex = 0;
             }
         }

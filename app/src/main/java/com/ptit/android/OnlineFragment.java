@@ -55,15 +55,9 @@ public class OnlineFragment extends ListFragment {
 
         adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1);
         lvSong = getListView();
-        // Getting all songs list
-//        Intent intent = getIntent();
-//        currentSongIndex = intent.getExtras().getInt("songIndex");
-//        txtSearch = intent.getExtras().getString("txtSearch");
-//        typeSearch = intent.getExtras().getLong("typeSearch");
         if (typeSearch == null) {
             typeSearch = Constants.SEARCH_TYPE.TITLE;
         }
-//        performSearch(txtSearch);
         edtSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -100,63 +94,12 @@ public class OnlineFragment extends ListFragment {
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 MainActivity.playMusicFragment = playMusicFragment;
                 fragmentTransaction.replace(R.id.fragment_container, playMusicFragment, "playMusicFragment");
-//                MainActivity.navigationView.setSelectedItemId(R.id.actionPlaying);
-//                fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
-//                Intent in = new Intent(OnlineFragment.this, PlayMusicActivity.class);
-//                // Sending songIndex to PlayMusicActivity
-//                in.putExtra("songOnlineIndex", songIndex);
-//                in.putExtra("txtSearch", txtSearch);
-//                in.putExtra("MODE", ONLINE_MODE);
-//                setResult(Constants.MODE.ONLINE.intValue(), in);
-//                finish();
             }
         });
-
-//        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-//        lvSong = getListView();
-//        // Getting all songs list
-//        Intent intent = getIntent();
-//        currentSongIndex = intent.getExtras().getInt("songIndex");
-//        txtSearch = intent.getExtras().getString("txtSearch");
-//        typeSearch = intent.getExtras().getLong("typeSearch");
-//        if(typeSearch == null) {
-//            typeSearch = Constants.SEARCH_TYPE.TITLE;
-//        }
-//        performSearch(txtSearch);
-//
-//        lvSong.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                // getting listitem index
-//                int songIndex = position;
-//                // Starting new intent
-//                Intent in = new Intent(OnlineFragment.this, PlayMusicActivity.class);
-//                // Sending songIndex to PlayMusicActivity
-//                in.putExtra("songOnlineIndex", songIndex);
-//                in.putExtra("txtSearch", txtSearch);
-//                in.putExtra("MODE", ONLINE_MODE);
-//                setResult(Constants.MODE.ONLINE.intValue(), in);
-//                finish();
-//            }
-//        });
     }
 
-//    }
-//
-////        btnSearch.setOnClickListener(new View.OnClickListener() {
-////            @Override
-////            public void onClick(View v) {
-////                txtSearch = edtSearch.getText().toString();
-////                if (txtSearch != null && !txtSearch.isEmpty()) {
-////                    Intent intent = new Intent(MainActivity.this, OnlineFragment.class);
-////                    intent.putExtra("txtSearch", txtSearch);
-////                    startActivity(intent);
-////                }
-////            }
-////        });
-//
-//    }
+
 
     public void performSearch(String txtSearch) {
         final SongsManager songsManager = new SongsManager();
@@ -166,16 +109,11 @@ public class OnlineFragment extends ListFragment {
                     System.out.println("size songlist:" + songList.size());
                     ArrayList<Song> songLst = new ArrayList<>();
                     for (Song song : songList) {
-                        Song songBean = songsManager.getInfoSongFromSource(song.getSource());
+                        Song songBean = songsManager.getInfoSongFromSource(Constants.MODE.ONLINE, song.getSource());
                         songLst.add(songBean);
                     }
                     MyArrayAdapter mayArr = new MyArrayAdapter(getActivity(), R.layout.list_row, songLst);
                     lvSong.setAdapter(mayArr);
-
-//                    ListAdapter adapter = new SimpleAdapter(getActivity(), songList,
-//                            R.layout.playlist_item, new String[]{"songTitle"}, new int[]{
-//                            R.id.songTitle});
-//                    setListAdapter(adapter);
                 }
             });
         }
