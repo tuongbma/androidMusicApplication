@@ -1,4 +1,4 @@
-package com.ptit.android;
+package com.ptit.android.Fragment;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,6 +36,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidhive.musicplayer.R;
+import com.ptit.android.Constants;
+import com.ptit.android.SongsManager;
+import com.ptit.android.Utilities;
 import com.ptit.android.model.Song;
 
 public class PlayMusicFragment extends Fragment implements OnCompletionListener, SeekBar.OnSeekBarChangeListener  {
@@ -68,11 +71,15 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
     private String textSearch;
     private boolean isShuffle = false;
     private boolean isRepeat = false;
+    private ImageButton btnDownload;
+    private ImageButton btnLike;
+//    FirebaseStorage firebaseStorage;
+
     private static final String SERVER_STORAGE = "https://firebasestorage.googleapis.com/v0/b/musicapplication-f21a5.appspot.com/o/";
     private ArrayList<HashMap<String, String>> songsListOffline = new ArrayList<HashMap<String, String>>();
     private ArrayList<HashMap<String, String>> songsListOnline = new ArrayList<HashMap<String, String>>();
     private ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
-
+    private String linkDowload = null;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -84,6 +91,8 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         btnPlay = (ImageButton) v.findViewById(R.id.btnPlay);
+        btnDownload = (ImageButton) v.findViewById(R.id.btnDownload);
+        btnLike = (ImageButton) v.findViewById(R.id.btnLike);
         btnForward = (ImageButton) v.findViewById(R.id.btnForward);
         btnBackward = (ImageButton) v.findViewById(R.id.btnBackward);
         btnNext = (ImageButton) v.findViewById(R.id.btnNext);
@@ -147,6 +156,20 @@ public class PlayMusicFragment extends Fragment implements OnCompletionListener,
                         btnPlay.setImageResource(R.drawable.btn_pause);
                     }
                 }
+
+            }
+        });
+
+        btnDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+
+            }
+        });
+
+        btnLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
 
             }
         });

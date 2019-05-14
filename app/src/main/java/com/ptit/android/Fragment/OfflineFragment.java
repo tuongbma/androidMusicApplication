@@ -1,11 +1,8 @@
-package com.ptit.android;
+package com.ptit.android.Fragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import android.app.ListActivity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,13 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.androidhive.musicplayer.R;
+import com.ptit.android.Constants;
 import com.ptit.android.MyAdapter.MyArrayAdapter;
+import com.ptit.android.SongsManager;
 import com.ptit.android.model.Song;
 
 public class OfflineFragment extends ListFragment {

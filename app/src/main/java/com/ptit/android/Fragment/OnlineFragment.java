@@ -1,11 +1,8 @@
-package com.ptit.android;
+package com.ptit.android.Fragment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.annotation.SuppressLint;
-import android.app.ListActivity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,12 +18,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import com.androidhive.musicplayer.R;
+import com.ptit.android.Constants;
+import com.ptit.android.MainActivity;
 import com.ptit.android.MyAdapter.MyArrayAdapter;
+import com.ptit.android.SongsManager;
 import com.ptit.android.model.Song;
 
 public class OnlineFragment extends ListFragment {
@@ -100,9 +98,10 @@ public class OnlineFragment extends ListFragment {
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 MainActivity.playMusicFragment = playMusicFragment;
                 fragmentTransaction.replace(R.id.fragment_container, playMusicFragment, "playMusicFragment");
-//                MainActivity.navigationView.setSelectedItemId(R.id.actionPlaying);
 //                fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
+//                MainActivity.navigationView.getMenu().getItem(R.id.actionPlaying).setChecked(true);
+
 //                Intent in = new Intent(OnlineFragment.this, PlayMusicActivity.class);
 //                // Sending songIndex to PlayMusicActivity
 //                in.putExtra("songOnlineIndex", songIndex);

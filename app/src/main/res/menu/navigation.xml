@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/actionHome"
+        android:enabled="true"
+        android:icon="@drawable/home"
+        android:title="Home"
+        app:showAsAction="ifRoom"/>
+    <item
         android:id="@+id/actionOnline"
         android:enabled="true"
         android:icon="@drawable/online"

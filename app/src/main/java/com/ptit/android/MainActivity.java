@@ -21,9 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import org.tensorflow.lite.Interpreter;
 
@@ -45,6 +43,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidhive.musicplayer.R;
+import com.ptit.android.Fragment.HomeFragment;
+import com.ptit.android.Fragment.OfflineFragment;
+import com.ptit.android.Fragment.OnlineFragment;
+import com.ptit.android.Fragment.PersonalFragment;
+import com.ptit.android.Fragment.PlayMusicFragment;
 import com.ptit.android.MyAdapter.MyArrayAdapter;
 import com.ptit.android.model.Song;
 import com.ptit.android.speechrecognize.RecognizeCommands;
@@ -88,7 +91,10 @@ public class MainActivity<recordingBufferLock> extends AppCompatActivity {
     public static Fragment onlineFragment = new OnlineFragment();
     public static Fragment offlineFragment = new OfflineFragment();
     public static Fragment playMusicFragment = new PlayMusicFragment();
+    public static Fragment homeFragment = new HomeFragment();
+    public static Fragment personalFragment = new PersonalFragment();
     public static FragmentManager fragmentManager;
+    public static BottomNavigationView navigationView;
     // UI elements.
     private static final int REQUEST_RECORD_AUDIO = 13;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -110,15 +116,11 @@ public class MainActivity<recordingBufferLock> extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        BottomNavigationView navigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        navigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         navigationView.setOnNavigationItemSelectedListener(navListener);
         lblSeachResult = findViewById(R.id.lblSearchResult);
         fragmentManager = getSupportFragmentManager();
-        loadFragment(offlineFragment, "offlineFragment");
-//        fragmentManager.beginTransaction().add(R.id.fragment_container, onlineFragment)
-//                .add(R.id.fragment_container, offlineFragment)
-//                .add(R.id.fragment_container, playMusicFragment)
-//                .commit();
+        loadFragment(homeFragment, "homeFragment");
         btnOnline = (ImageButton) findViewById(R.id.btnSearch);
 //        btnOffline = (Button) findViewById(R.id.btnOffline);
         edtSearch = (EditText) findViewById(R.id.txtSearch);
@@ -458,26 +460,35 @@ public class MainActivity<recordingBufferLock> extends AppCompatActivity {
                     Fragment fragment = null;
                     if (offlineFragment != null && onlineFragment != null && playMusicFragment != null) {
                         switch (menuItem.getItemId()) {
+                            case R.id.actionHome:
+                                if (!checkIfFragmentExisted("homeFragment")) {
+                                    loadFragment(homeFragment, "homeFragment");
+                                }
+                                showHideFragment(homeFragment, onlineFragment, offlineFragment, playMusicFragment, personalFragment);
+                                break;
                             case R.id.actionOnline:
                                 if (!checkIfFragmentExisted("onlineFragment")) {
                                     loadFragment(onlineFragment, "onlineFragment");
                                 }
-                                showHideFragment(onlineFragment, offlineFragment, playMusicFragment);
+                                showHideFragment(onlineFragment, homeFragment, personalFragment, offlineFragment, playMusicFragment);
                                 break;
                             case R.id.actionOffline:
                                 if (!checkIfFragmentExisted("offlineFragment")) {
                                     loadFragment(offlineFragment, "offlineFragment");
                                 }
-                                showHideFragment(offlineFragment, onlineFragment, playMusicFragment);
+                                showHideFragment(offlineFragment, homeFragment, personalFragment, onlineFragment, playMusicFragment);
                                 break;
                             case R.id.actionPlaying:
                                 if (!checkIfFragmentExisted("playMusicFragment")) {
-                                    System.out.println("NOT AĐDD");
                                     loadFragment(playMusicFragment, "playMusicFragment");
                                 }
-                                showHideFragment(playMusicFragment, onlineFragment, offlineFragment);
+                                showHideFragment(playMusicFragment, homeFragment, personalFragment, onlineFragment, offlineFragment);
                                 break;
                             case R.id.actionPersonal:
+                                if (!checkIfFragmentExisted("personalFragment")) {
+                                    loadFragment(personalFragment, "personalFragment");
+                                }
+                                showHideFragment(personalFragment, playMusicFragment, homeFragment, onlineFragment, offlineFragment);
                                 break;
                         }
                         return true;
@@ -486,7 +497,7 @@ public class MainActivity<recordingBufferLock> extends AppCompatActivity {
                 }
             };
 
-    public void showHideFragment(Fragment fragment1, Fragment fragment2, Fragment fragment3) {
+    public void showHideFragment(Fragment fragment1, Fragment fragment2, Fragment fragment3, Fragment fragment4, Fragment fragment5) {
         if (fragment1.isHidden()) {
             fragmentManager.beginTransaction()
                     .show(fragment1)
@@ -495,6 +506,8 @@ public class MainActivity<recordingBufferLock> extends AppCompatActivity {
         fragmentManager.beginTransaction()
                 .hide(fragment2)
                 .hide(fragment3)
+                .hide(fragment4)
+                .hide(fragment5)
                 .commit();
     }
 

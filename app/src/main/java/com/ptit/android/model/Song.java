@@ -10,6 +10,7 @@ public class Song {
     private String duration;
     private Bitmap songImage;
     private String genre;
+    private String linkDownload;
 
     public Song() {
     }
@@ -69,4 +70,6 @@ public class Song {
     public void setSongImage(Bitmap songImage) {
         this.songImage = songImage;
     }
+
+
 }
